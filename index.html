@@ -59,13 +59,56 @@
         <div class="add-form-row">
           <button class="add-form-button">Написать</button>
         </div>
+        <div class="error-message" style="color: red; display: none;"></div>
       </div>
     </div>
   </body>
 
   <script>
     "use strict";
-    // Тест репозитория
-    console.log("It works!");
+    const nameInput = document.querySelector('.add-form-name');
+    const commentInput = document.querySelector('.add-form-text');
+    const addButton = document.querySelector('.add-form-button');
+    const commentsList = document.querySelector('.comments');
+    const errorMessage = document.querySelector('.error-message');
+
+    addButton.addEventListener('click', () => {
+      const name = nameInput.value.trim();
+      const comment = commentInput.value.trim();
+      const currentDate = new Date().toLocaleString();
+
+      if (!name || !comment) {
+        errorMessage.textContent = 'Пожалуйста, заполните все поля.';
+        errorMessage.style.display = 'block';
+        return;
+      } else {
+        errorMessage.style.display = 'none'; 
+      }
+
+      const newComment = `
+        <li class="comment">
+          <div class="comment-header">
+            <div>${name}</div>
+            <div>${currentDate}</div>
+          </div>
+          <div class="comment-body">
+            <div class="comment-text">
+              ${comment}
+            </div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">0</span>
+              <button class="like-button"></button>
+            </div>
+          </div>
+        </li>
+      `;
+
+      commentsList.innerHTML += newComment;
+
+      nameInput.value = '';
+      commentInput.value = '';
+    });
   </script>
 </html>
