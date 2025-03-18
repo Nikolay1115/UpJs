@@ -88,6 +88,7 @@
                 </li>
             `).join('');
             attachLikeHandlers();
+            attachCommentHandlers();
         }
 
         function handleLikeClick(index) {
@@ -99,7 +100,24 @@
         function attachLikeHandlers() {
             const likeButtons = document.querySelectorAll('.like-button');
             likeButtons.forEach((button, index) => {
-                button.addEventListener('click', () => handleLikeClick(index));
+                button.addEventListener('click', (event) => {
+                    event.stopPropagation(); 
+                    handleLikeClick(index);
+                });
+            });
+        }
+
+        function attachCommentHandlers() {
+            const commentItems = document.querySelectorAll('.comment');
+            commentItems.forEach(commentItem => {
+                commentItem.addEventListener('click', () => {
+                    const index = commentItem.getAttribute('data-index');
+                    const comment = commentsData[index];
+                    const safeName = comment.name.replaceAll(/</g, "&lt;").replaceAll(/>/g, "&gt;");
+                    const safeText = comment.text.replaceAll(/</g, "&lt;").replaceAll(/>/g, "&gt;");
+                    nameInput.value = safeName;
+                    commentInput.value = `> ${safeText}`;
+                });
             });
         }
 
@@ -123,10 +141,8 @@
             nameInput.value = '';
             commentInput.value = '';
         });
-
-
         renderComments();
     </script>
 </body>
-</html> 
+</html>
 
