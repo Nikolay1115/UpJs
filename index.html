@@ -67,16 +67,25 @@
             { name: "Варвара Н.", text: "Мне нравится как оформлена эта страница! ❤", date: "13.02.22 19:22", likes: 75, liked: true }
         ];
 
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
         function renderComments() {
             commentsList.innerHTML = commentsData.map((comment, index) => `
                 <li class="comment" data-index="${index}">
                     <div class="comment-header">
-                        <div>${comment.name}</div>
+                        <div>${escapeHtml(comment.name)}</div>
                         <div>${comment.date}</div>
                     </div>
                     <div class="comment-body">
                         <div class="comment-text">
-                            ${comment.text}
+                            ${escapeHtml(comment.text)}
                         </div>
                     </div>
                     <div class="comment-footer">
@@ -113,8 +122,9 @@
                 commentItem.addEventListener('click', () => {
                     const index = commentItem.getAttribute('data-index');
                     const comment = commentsData[index];
-                    const safeName = comment.name.replaceAll(/</g, "&lt;").replaceAll(/>/g, "&gt;");
-                    const safeText = comment.text.replaceAll(/</g, "&lt;").replaceAll(/>/g, "&gt;");
+                    const safeName = escapeHtml(comment.name);
+                    const safeText = escapeHtml(comment.text);
+                    
                     nameInput.value = safeName;
                     commentInput.value = `> ${safeText}`;
                 });
@@ -134,16 +144,15 @@
                 errorMessage.style.display = 'none'; 
             }
 
-            commentsData.push({ name, text: comment, date: currentDate, likes: 0, liked: false });
+            commentsData.push({ name: escapeHtml(name), text: escapeHtml(comment), date: currentDate, likes: 0, liked: false });
 
             renderComments();
 
             nameInput.value = '';
             commentInput.value = '';
         });
+
         renderComments();
-        
     </script>
 </body>
 </html>
-
