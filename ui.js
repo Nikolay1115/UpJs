@@ -1,6 +1,8 @@
 "use strict"
 
-import { getComments, escapeHtml, toggleLike } from "./comment.js"
+import { getComments, toggleLike, addComment } from "./comment.js"
+import { escapeHtml } from "./utilits.js"
+import { attachLikeHandlers, attachCommentHandlers } from "./listeners.js"
 
 const nameInput = document.querySelector(".add-form-name")
 const commentInput = document.querySelector(".add-form-text")
@@ -34,30 +36,7 @@ export function renderComments() {
         )
         .join("")
     attachLikeHandlers()
-    attachCommentHandlers()
-}
-
-function attachLikeHandlers() {
-    const likeButtons = document.querySelectorAll(".like-button")
-    likeButtons.forEach((button, index) => {
-        button.addEventListener("click", (event) => {
-            event.stopPropagation()
-            toggleLike(index)
-            renderComments()
-        })
-    })
-}
-
-function attachCommentHandlers() {
-    const commentItems = document.querySelectorAll(".comment")
-    commentItems.forEach((commentItem) => {
-        commentItem.addEventListener("click", () => {
-            const index = commentItem.getAttribute("data-index")
-            const comment = getComments()[index]
-            nameInput.value = escapeHtml(comment.name)
-            commentInput.value = `> ${escapeHtml(comment.text)}`
-        })
-    })
+    attachCommentHandlers(nameInput, commentInput)
 }
 
 export function setupAddComment() {
