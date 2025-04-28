@@ -1,8 +1,6 @@
-"use strict"
-
-import { renderComments, setupAddComment } from "./ui.js"
+import { renderComments, setup } from "./ui.js"
 
 document.addEventListener("DOMContentLoaded", () => {
     renderComments()
-    setupAddComment()
+    setup()
 })

@@ -1,8 +1,9 @@
-"use strict"
-
-import { getComments, toggleLike, addComment } from "./comment.js"
-import { escapeHtml } from "./utilits.js"
-import { attachLikeHandlers, attachCommentHandlers } from "./listeners.js"
+import { getComments } from "./comment.js"
+import {
+    attachLikeHandlers,
+    attachCommentHandlers,
+    setupAddComment,
+} from "./listeners.js"
 
 const nameInput = document.querySelector(".add-form-name")
 const commentInput = document.querySelector(".add-form-text")
@@ -17,12 +18,12 @@ export function renderComments() {
             (comment, index) => `
             <li class="comment" data-index="${index}">
                 <div class="comment-header">
-                    <div>${escapeHtml(comment.name)}</div>
+                    <div>${comment.name}</div>
                     <div>${comment.date}</div>
                 </div>
                 <div class="comment-body">
                     <div class="comment-text">
-                        ${escapeHtml(comment.text)}
+                        ${comment.text}
                     </div>
                 </div>
                 <div class="comment-footer">
@@ -39,24 +40,7 @@ export function renderComments() {
     attachCommentHandlers(nameInput, commentInput)
 }
 
-export function setupAddComment() {
-    addButton.addEventListener("click", () => {
-        const name = nameInput.value.trim()
-        const comment = commentInput.value.trim()
-        const currentDate = new Date().toLocaleString()
-
-        if (!name || !comment) {
-            errorMessage.textContent = "Пожалуйста, заполните все поля."
-            errorMessage.style.display = "block"
-            return
-        } else {
-            errorMessage.style.display = "none"
-        }
-
-        addComment(escapeHtml(name), escapeHtml(comment), currentDate)
-        renderComments()
-
-        nameInput.value = ""
-        commentInput.value = ""
-    })
+export function setup() {
+    setupAddComment(nameInput, commentInput, addButton, errorMessage)
 }
+;``
