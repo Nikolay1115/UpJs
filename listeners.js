@@ -1,4 +1,4 @@
-import { toggleLike, getComments, addComment } from "./comment.js"
+import { toggleLike, getComments, commentsData } from "./comment.js"
 import { renderComments } from "./ui.js"
 
 export function attachLikeHandlers() {
@@ -21,6 +21,16 @@ export function attachCommentHandlers(nameInput, commentInput) {
             nameInput.value = comment.name
             commentInput.value = `> ${comment.text}`
         })
+    })
+}
+
+export function addComment(name, text, date) {
+    commentsData.push({
+        name,
+        text,
+        date,
+        likes: 0,
+        liked: false,
     })
 }
 

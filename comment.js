@@ -23,3 +23,4 @@ export function toggleLike(index) {
     commentsData[index].liked = !commentsData[index].liked
     commentsData[index].likes += commentsData[index].liked ? 1 : -1
 }
+export { commentsData };
