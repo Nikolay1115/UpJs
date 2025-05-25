@@ -1,62 +1,34 @@
-import { toggleLike, getComments, commentsData } from "./comment.js"
-import { renderComments } from "./ui.js"
+import { postCommentToAPI, fetchCommentsFromAPI } from "./api.js";
+import { updateCommentsData, getComments } from "./comment.js";
+import { renderComments } from "./ui.js";
 
-export function attachLikeHandlers() {
-    const likeButtons = document.querySelectorAll(".like-button")
-    likeButtons.forEach((button, index) => {
-        button.addEventListener("click", (event) => {
-            event.stopPropagation()
-            toggleLike(index)
-            renderComments()
-        })
-    })
-}
-
-export function attachCommentHandlers(nameInput, commentInput) {
-    const commentItems = document.querySelectorAll(".comment")
-    commentItems.forEach((commentItem) => {
-        commentItem.addEventListener("click", () => {
-            const index = commentItem.getAttribute("data-index")
-            const comment = getComments()[index]
-            nameInput.value = comment.name
-            commentInput.value = `> ${comment.text}`
-        })
-    })
-}
-
-export function addComment(name, text, date) {
-    commentsData.push({
-        name,
-        text,
-        date,
-        likes: 0,
-        liked: false,
-    })
-}
-
-export function setupAddComment(
-    nameInput,
-    commentInput,
-    addButton,
-    errorMessage,
-) {
-    addButton.addEventListener("click", () => {
-        const name = nameInput.value.trim()
-        const comment = commentInput.value.trim()
-        const currentDate = new Date().toLocaleString()
-
-        if (!name || !comment) {
-            errorMessage.textContent = "Пожалуйста, заполните все поля."
-            errorMessage.style.display = "block"
-            return
-        } else {
-            errorMessage.style.display = "none"
+export function setupAddComment(nameInput, commentInput, addButton, errorMessage) {
+    addButton.addEventListener("click", async () => {
+        try {
+            await postCommentToAPI(nameInput.value.trim(), commentInput.value.trim());
+            const data = await fetchCommentsFromAPI();
+            updateCommentsData(data.comments);
+            renderComments();
+            nameInput.value = "";
+            commentInput.value = "";
+            errorMessage.style.display = "none";
+        } catch (error) {
+            errorMessage.textContent = error.message;
+            errorMessage.style.display = "block";
         }
+    });
+}
 
-        addComment(name, comment, currentDate)
-        renderComments()
+export function toggleLike(index) {
+    const comments = getComments();
+    comments[index].isLiked = !comments[index].isLiked;
+    comments[index].likes += comments[index].isLiked ? 1 : -1;
+}
 
-        nameInput.value = ""
-        commentInput.value = ""
-    })
+export function setupQuote(comment) {
+    const nameInput = document.querySelector(".add-form-name");
+    const commentInput = document.querySelector(".add-form-text");
+    nameInput.value = comment.author.name;
+    commentInput.value = `> ${comment.text}\n\n`;
+    commentInput.focus();
 }
