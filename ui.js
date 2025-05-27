@@ -1,14 +1,20 @@
-import { getComments } from "./comment.js";
+import { getComments, getLoadingState } from "./comment.js";
 import { toggleLike, setupQuote } from "./listeners.js";
 import { escapeHtml } from "./utilits.js";
 
 export function renderComments() {
     const commentsList = document.querySelector(".comments");
+    const { isLoading, isAdding } = getLoadingState();
+    
     if (!commentsList) return;
 
-    commentsList.innerHTML = "";
-    const comments = getComments();
+    commentsList.innerHTML = isLoading 
+        ? '<div class="loading">Загрузка комментариев...</div>' 
+        : '';
 
+    if (isLoading) return;
+
+    const comments = getComments();
     comments.forEach((comment, index) => {
         const commentItem = document.createElement("li");
         commentItem.className = "comment";
@@ -16,7 +22,7 @@ export function renderComments() {
         
         commentItem.innerHTML = `
             <div class="comment-header">
-                <div>${escapeHtml(comment.author.name)}</div>
+                <div>${escapeHtml(comment.author?.name || 'Аноним')}</div>
                 <div>${new Date(comment.date).toLocaleString()}</div>
             </div>
             <div class="comment-body">
@@ -25,7 +31,10 @@ export function renderComments() {
             <div class="comment-footer">
                 <div class="likes">
                     <span class="likes-counter">${comment.likes}</span>
-                    <button class="like-button ${comment.isLiked ? '-active-like' : ''}"></button>
+                    <button class="like-button 
+                        ${comment.isLiked ? '-active-like' : ''}
+                        ${comment.isLikeLoading ? '-loading-like' : ''}"
+                        data-index="${index}"></button>
                 </div>
             </div>
         `;
@@ -34,12 +43,26 @@ export function renderComments() {
             setupQuote(comment);
         });
 
-        commentItem.querySelector('.like-button').addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleLike(index);
-            renderComments();
-        });
+        const likeButton = commentItem.querySelector('.like-button');
+        if (likeButton) {
+            likeButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleLike(parseInt(e.target.dataset.index));
+            });
+        }
 
         commentsList.appendChild(commentItem);
     });
+}
+
+export function updateFormState(isLoading) {
+    const button = document.querySelector(".add-form-button");
+    const inputs = document.querySelectorAll(".add-form-name, .add-form-text");
+    
+    if (button) button.disabled = isLoading;
+    inputs.forEach(input => {
+        input.disabled = isLoading;
+    });
+    
+    if (button) button.textContent = isLoading ? "Отправка..." : "Написать";
 }
