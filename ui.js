@@ -1,28 +1,28 @@
-import { getComments, getLoadingState } from "./comment.js";
-import { toggleLike, setupQuote } from "./listeners.js";
-import { escapeHtml } from "./utilits.js";
+import { getComments, getLoadingState } from "./comment.js"
+import { toggleLike, setupQuote } from "./listeners.js"
+import { escapeHtml } from "./utilits.js"
 
 export function renderComments() {
-    const commentsList = document.querySelector(".comments");
-    const { isLoading, isAdding } = getLoadingState();
-    
-    if (!commentsList) return;
+    const commentsList = document.querySelector(".comments")
+    const { isLoading, isAdding } = getLoadingState()
 
-    commentsList.innerHTML = isLoading 
-        ? '<div class="loading">Загрузка комментариев...</div>' 
-        : '';
+    if (!commentsList) return
 
-    if (isLoading) return;
+    commentsList.innerHTML = isLoading
+        ? '<div class="loading">Загрузка комментариев...</div>'
+        : ""
 
-    const comments = getComments();
+    if (isLoading) return
+
+    const comments = getComments()
     comments.forEach((comment, index) => {
-        const commentItem = document.createElement("li");
-        commentItem.className = "comment";
-        commentItem.dataset.index = index;
-        
+        const commentItem = document.createElement("li")
+        commentItem.className = "comment"
+        commentItem.dataset.index = index
+
         commentItem.innerHTML = `
             <div class="comment-header">
-                <div>${escapeHtml(comment.author?.name || 'Аноним')}</div>
+                <div>${escapeHtml(comment.author?.name || "Аноним")}</div>
                 <div>${new Date(comment.date).toLocaleString()}</div>
             </div>
             <div class="comment-body">
@@ -32,37 +32,39 @@ export function renderComments() {
                 <div class="likes">
                     <span class="likes-counter">${comment.likes}</span>
                     <button class="like-button 
-                        ${comment.isLiked ? '-active-like' : ''}
-                        ${comment.isLikeLoading ? '-loading-like' : ''}"
+                        ${comment.isLiked ? "-active-like" : ""}
+                        ${comment.isLikeLoading ? "-loading-like" : ""}"
                         data-index="${index}"></button>
                 </div>
             </div>
-        `;
+        `
 
-        commentItem.querySelector('.comment-text').addEventListener('click', () => {
-            setupQuote(comment);
-        });
+        commentItem
+            .querySelector(".comment-text")
+            .addEventListener("click", () => {
+                setupQuote(comment)
+            })
 
-        const likeButton = commentItem.querySelector('.like-button');
+        const likeButton = commentItem.querySelector(".like-button")
         if (likeButton) {
-            likeButton.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleLike(parseInt(e.target.dataset.index));
-            });
+            likeButton.addEventListener("click", (e) => {
+                e.stopPropagation()
+                toggleLike(parseInt(e.target.dataset.index))
+            })
         }
 
-        commentsList.appendChild(commentItem);
-    });
+        commentsList.appendChild(commentItem)
+    })
 }
 
 export function updateFormState(isLoading) {
-    const button = document.querySelector(".add-form-button");
-    const inputs = document.querySelectorAll(".add-form-name, .add-form-text");
-    
-    if (button) button.disabled = isLoading;
-    inputs.forEach(input => {
-        input.disabled = isLoading;
-    });
-    
-    if (button) button.textContent = isLoading ? "Отправка..." : "Написать";
+    const button = document.querySelector(".add-form-button")
+    const inputs = document.querySelectorAll(".add-form-name, .add-form-text")
+
+    if (button) button.disabled = isLoading
+    inputs.forEach((input) => {
+        input.disabled = isLoading
+    })
+
+    if (button) button.textContent = isLoading ? "Отправка..." : "Написать"
 }

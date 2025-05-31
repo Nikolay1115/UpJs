@@ -1,15 +1,15 @@
 export function escapeHtml(unsafe) {
-    if (typeof unsafe !== 'string') return unsafe;
+    if (typeof unsafe !== "string") return unsafe
     return unsafe
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(/'/g, "&#039;")
 }
 
 export function addGlobalStyles() {
-    const style = document.createElement('style');
+    const style = document.createElement("style")
     style.textContent = `
         .loading {
             padding: 20px;
@@ -39,6 +39,6 @@ export function addGlobalStyles() {
         .like-button:hover:not(.-loading-like) {
             transform: scale(1.1);
         }
-    `;
-    document.head.appendChild(style);
+    `
+    document.head.appendChild(style)
 }
