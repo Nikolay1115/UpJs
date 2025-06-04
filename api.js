@@ -2,22 +2,56 @@ const personalKey = "nikolay-skorikov"
 const apiUrl = `https://wedev-api.sky.pro/api/v1/${personalKey}/comments`
 
 export async function fetchCommentsFromAPI() {
-    const response = await fetch(apiUrl)
-    if (!response.ok) {
-        throw new Error("Ошибка сервера")
+    try {
+        const response = await fetch(apiUrl)
+        if (!response.ok) {
+            if (response.status === 500) {
+                throw new Error("Ошибка сервера. Пожалуйста, попробуйте позже.")
+            }
+            throw new Error("Ошибка при загрузке комментариев")
+        }
+        return response.json()
+    } catch (error) {
+        if (error.message === "Failed to fetch") {
+            throw new Error(
+                "Проблемы с интернетом. Проверьте соединение и попробуйте снова.",
+            )
+        }
+        throw error
     }
-    return response.json()
 }
 
 export async function postCommentToAPI({ name, text }) {
-    const response = await fetch(apiUrl, {
-        method: "POST",
-        body: JSON.stringify({ name, text }),
-    })
-    if (!response.ok) {
-        throw new Error("Ошибка сервера")
+    try {
+        const response = await fetch(apiUrl, {
+            method: "POST",
+            body: JSON.stringify({
+                name,
+                text,
+                forceError: Math.random() > 0.5, // 50% chance of error
+            }),
+        })
+
+        if (!response.ok) {
+            if (response.status === 400) {
+                throw new Error(
+                    "Имя и комментарий должны быть не короче 3 символов",
+                )
+            }
+            if (response.status === 500) {
+                throw new Error("Ошибка сервера. Пожалуйста, попробуйте позже.")
+            }
+            throw new Error("Ошибка при отправке комментария")
+        }
+        return response.json()
+    } catch (error) {
+        if (error.message === "Failed to fetch") {
+            throw new Error(
+                "Проблемы с интернетом. Проверьте соединение и попробуйте снова.",
+            )
+        }
+        throw error
     }
-    return response.json()
 }
 
 export function delay(interval = 300) {

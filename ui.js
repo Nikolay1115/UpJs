@@ -1,10 +1,11 @@
-import { getComments, getLoadingState } from "./comment.js"
+import { getComments, getLoadingState, getFormData } from "./comment.js"
 import { toggleLike, setupQuote } from "./listeners.js"
 import { escapeHtml } from "./utilits.js"
 
 export function renderComments() {
     const commentsList = document.querySelector(".comments")
     const { isLoading, isAdding } = getLoadingState()
+    const formData = getFormData()
 
     if (!commentsList) return
 
@@ -13,6 +14,18 @@ export function renderComments() {
         : ""
 
     if (isLoading) return
+
+    // Восстанавливаем данные формы
+    const nameInput = document.querySelector(".add-form-name")
+    const commentInput = document.querySelector(".add-form-text")
+
+    if (nameInput && !nameInput.value) {
+        nameInput.value = formData.name
+    }
+
+    if (commentInput && !commentInput.value) {
+        commentInput.value = formData.text
+    }
 
     const comments = getComments()
     comments.forEach((comment, index) => {
