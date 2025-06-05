@@ -16,7 +16,6 @@ export function setupAddComment(
     addButton,
     errorMessage,
 ) {
-    // Сохраняем данные формы при вводе
     nameInput.addEventListener("input", () => {
         updateFormData({ name: nameInput.value })
     })
@@ -29,13 +28,6 @@ export function setupAddComment(
         const name = nameInput.value.trim()
         const text = commentInput.value.trim()
 
-        if (name.length < 3 || text.length < 3) {
-            errorMessage.textContent =
-                "Имя и комментарий должны быть не короче 3 символов"
-            errorMessage.style.display = "block"
-            return
-        }
-
         try {
             setAdding(true)
             updateFormState(true)
@@ -47,13 +39,12 @@ export function setupAddComment(
             const data = await fetchCommentsFromAPI()
             updateCommentsData(data.comments)
 
-            // Очищаем форму только при успешной отправке
             nameInput.value = ""
             commentInput.value = ""
             updateFormData({ name: "", text: "" })
             errorMessage.style.display = "none"
         } catch (error) {
-            alert(error.message) // Показываем alert с ошибкой
+            alert(error.message)
             errorMessage.textContent = error.message
             errorMessage.style.display = "block"
         } finally {

@@ -12,7 +12,10 @@ export async function fetchCommentsFromAPI() {
         }
         return response.json()
     } catch (error) {
-        if (error.message === "Failed to fetch") {
+        if (
+            error.message === "Failed to fetch" ||
+            error.message.includes("NetworkError")
+        ) {
             throw new Error(
                 "Проблемы с интернетом. Проверьте соединение и попробуйте снова.",
             )
@@ -28,7 +31,7 @@ export async function postCommentToAPI({ name, text }) {
             body: JSON.stringify({
                 name,
                 text,
-                forceError: Math.random() > 0.5, // 50% chance of error
+                forceError: Math.random() > 0.5,
             }),
         })
 
@@ -45,7 +48,10 @@ export async function postCommentToAPI({ name, text }) {
         }
         return response.json()
     } catch (error) {
-        if (error.message === "Failed to fetch") {
+        if (
+            error.message === "Failed to fetch" ||
+            error.message.includes("NetworkError")
+        ) {
             throw new Error(
                 "Проблемы с интернетом. Проверьте соединение и попробуйте снова.",
             )
