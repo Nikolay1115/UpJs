@@ -1,11 +1,11 @@
-import { getComments, getLoadingState, getFormData } from "./comment.js"
+import { getComments, getLoadingState, getAuthData } from "./comment.js"
 import { toggleLike, setupQuote } from "./listeners.js"
 import { escapeHtml } from "./utilits.js"
 
 export function renderComments() {
     const commentsList = document.querySelector(".comments")
     const { isLoading, isAdding } = getLoadingState()
-    const formData = getFormData()
+    const authData = getAuthData()
 
     if (!commentsList) return
 
@@ -14,18 +14,6 @@ export function renderComments() {
         : ""
 
     if (isLoading) return
-
-    // Восстанавливаем данные формы
-    const nameInput = document.querySelector(".add-form-name")
-    const commentInput = document.querySelector(".add-form-text")
-
-    if (nameInput && !nameInput.value) {
-        nameInput.value = formData.name
-    }
-
-    if (commentInput && !commentInput.value) {
-        commentInput.value = formData.text
-    }
 
     const comments = getComments()
     comments.forEach((comment, index) => {
@@ -68,11 +56,14 @@ export function renderComments() {
 
         commentsList.appendChild(commentItem)
     })
+
+    // Обновляем отображение формы в зависимости от авторизации
+    updateAuthState()
 }
 
 export function updateFormState(isLoading) {
     const button = document.querySelector(".add-form-button")
-    const inputs = document.querySelectorAll(".add-form-name, .add-form-text")
+    const inputs = document.querySelectorAll(".add-form-text")
 
     if (button) button.disabled = isLoading
     inputs.forEach((input) => {
@@ -80,4 +71,40 @@ export function updateFormState(isLoading) {
     })
 
     if (button) button.textContent = isLoading ? "Отправка..." : "Написать"
+}
+
+export function updateAuthState() {
+    const authData = getAuthData()
+    const authLink = document.querySelector(".auth-link")
+    const addForm = document.querySelector(".add-form")
+    const nameInput = document.querySelector(".add-form-name")
+
+    if (authData) {
+        // Пользователь авторизован
+        if (authLink) authLink.style.display = "none"
+        if (addForm) addForm.style.display = "flex"
+        if (nameInput) {
+            nameInput.value = authData.name
+            nameInput.disabled = false
+        }
+    } else {
+        // Пользователь не авторизован
+        if (authLink) authLink.style.display = "block"
+        if (addForm) addForm.style.display = "none"
+        if (nameInput) {
+            nameInput.value = ""
+            nameInput.disabled = true
+        }
+    }
+}
+
+export function showCommentsSection() {
+    document.getElementById("auth-section").style.display = "none"
+    document.getElementById("comments-section").style.display = "block"
+    updateAuthState()
+}
+
+export function showAuthSection() {
+    document.getElementById("auth-section").style.display = "block"
+    document.getElementById("comments-section").style.display = "none"
 }
